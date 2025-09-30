@@ -3,69 +3,10 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import pool from '../database/db.js';
+import authenticateToken from '../middleware/authenticateToken.js';
 
 // Initialize a new Express router
 const router = express.Router();
-
-// --- AUTHENTICATION MIDDLEWARE ---
-// This function verifies the JWT token from the Authorization header.
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    // Token is expected in the format: "Bearer TOKEN"
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (token == null) {
-        // 401 Unauthorized: No token was provided
-        return res.status(401).json({ message: 'Authentication token is required.' });
-    }
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            // 403 Forbidden: The token is invalid or expired
-            return res.status(403).json({ message: 'Token is invalid or has expired.' });
-        }
-        // Attach the decoded user payload to the request object for use in protected routes
-        req.user = user;
-        next(); // Proceed to the next middleware or route handler
-    });
-};
-
-// --- MEMBERSHIP MIDDLEWARE ---
-// This function checks if the authenticated user has an active membership.
-// To be used on routes that require a subscription (e.g., viewing courses).
-const checkMembership = async (req, res, next) => {
-    try {
-        const userId = req.user.userId;
-        const userResult = await pool.query(
-            'SELECT membership_expires_at, role FROM users WHERE user_id = $1',
-            [userId]
-        );
-
-        if (userResult.rows.length === 0) {
-            return res.status(404).json({ message: 'User not found.' });
-        }
-
-        const user = userResult.rows[0];
-
-        // Admins always have access
-        if (user.role === 'admin') {
-            return next();
-        }
-        
-        // A user is a member if their expiration is NULL (lifetime) or in the future.
-        const isMember = user.membership_expires_at === null || (user.membership_expires_at && new Date(user.membership_expires_at) > new Date());
-
-        if (!isMember) {
-            return res.status(403).json({ message: 'Access denied. An active membership is required.' });
-        }
-
-        next();
-    } catch (err) {
-        console.error('Membership Check Error:', err.message);
-        res.status(500).json({ message: 'Server error during membership check.' });
-    }
-};
-
 
 // --- API ROUTES ---
 
@@ -259,6 +200,4 @@ router.get('/profile', authenticateToken, async (req, res) => {
     }
 });
 
-// Use 'export default' to make the router available for import in index.js
 export default router;
-

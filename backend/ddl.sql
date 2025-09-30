@@ -128,9 +128,22 @@ CREATE TABLE forum_replies (
     CONSTRAINT fk_parent_reply FOREIGN KEY(parent_reply_id) REFERENCES forum_replies(reply_id) ON DELETE CASCADE
 );
 
+-- Stores research articles about specific stocks, authored by admins.
+CREATE TABLE researches (
+    research_id SERIAL PRIMARY KEY,
+    stock_symbol VARCHAR(10) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author_id UUID NOT NULL,
+    published_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_research_author FOREIGN KEY(author_id) REFERENCES users(user_id) ON DELETE SET NULL
+);
+
 -- Create indexes for frequently queried columns to improve performance.
 CREATE INDEX idx_courses_category_id ON courses(category_id);
 CREATE INDEX idx_lessons_course_id ON course_lessons(course_id);
 CREATE INDEX idx_news_category_id ON news(category_id);
 CREATE INDEX idx_forum_replies_forum_id ON forum_replies(forum_id);
 CREATE INDEX idx_forum_replies_parent_reply_id ON forum_replies(parent_reply_id);
+CREATE INDEX idx_researches_stock_symbol ON researches(stock_symbol);

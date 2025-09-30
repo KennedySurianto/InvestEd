@@ -4,6 +4,13 @@ import 'dotenv/config';
 
 // Import routes - note the required .js extension for local modules in ESM
 import userRoutes from './routes/users.js';
+import courseCategoryRoutes from './routes/courseCategories.js';
+import courseRoutes from './routes/courses.js';
+import courseLessonRoutes from './routes/courseLessons.js';
+import userEnrollmentRoutes from './routes/userCourseEnrollments.js';
+import userLessonCompletionRoutes from './routes/userLessonCompletions.js';
+import newsCategoriesRoutes from './routes/newsCategories.js';
+import newsRoutes from './routes/news.js';
 
 // --- INITIALIZATION ---
 const app = express();
@@ -16,8 +23,14 @@ app.use(cors());
 app.use(express.json()); 
 
 // --- USE ROUTES ---
-// Mount the user router. Any request starting with /api/users will be handled by this router.
 app.use('/api/users', userRoutes);
+app.use('/api/course-categories', courseCategoryRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/courses/:courseId/lessons', courseLessonRoutes);
+app.use('/api', userEnrollmentRoutes); // Note: userEnrollmentRoutes handles its own sub-paths
+app.use('/api', userLessonCompletionRoutes); // Note: userLessonCompletionRoutes handles its own sub-paths
+app.use('/api/news-categories', newsCategoriesRoutes);
+app.use('/api/news', newsRoutes);
 
 // --- A simple root route for testing if the server is running ---
 app.get('/', (req, res) => {
