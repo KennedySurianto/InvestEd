@@ -11,6 +11,9 @@ import userEnrollmentRoutes from './routes/userCourseEnrollments.js';
 import userLessonCompletionRoutes from './routes/userLessonCompletions.js';
 import newsCategoriesRoutes from './routes/newsCategories.js';
 import newsRoutes from './routes/news.js';
+import researchRoutes from './routes/researches.js';
+import forumRoutes from './routes/forums.js';
+import forumRepliesRoutes from './routes/forumReplies.js';
 
 // --- INITIALIZATION ---
 const app = express();
@@ -31,6 +34,9 @@ app.use('/api', userEnrollmentRoutes); // Note: userEnrollmentRoutes handles its
 app.use('/api', userLessonCompletionRoutes); // Note: userLessonCompletionRoutes handles its own sub-paths
 app.use('/api/news-categories', newsCategoriesRoutes);
 app.use('/api/news', newsRoutes);
+app.use('/api/researches', researchRoutes);
+app.use('/api/forums', forumRoutes);
+app.use('/api/forums/:forumId/replies', forumRepliesRoutes);
 
 // --- A simple root route for testing if the server is running ---
 app.get('/', (req, res) => {
