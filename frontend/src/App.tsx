@@ -11,6 +11,8 @@ import Home from './pages/Home';
 import NewsCategoriesPage from './pages/NewsCategory';
 import NewsPage from './pages/NewsByCategory';
 import NewsDetailPage from './pages/NewsDetail';
+import ResearchPage from './pages/Research';
+import ResearchDetailPage from './pages/ResearchDetail';
 
 import './App.css';
 
@@ -33,6 +35,10 @@ function App() {
           <Route path='/news-category' element={<NewsCategoriesPage />} />
           <Route path="/news-category/:categoryId" element={<NewsPage />} />
           <Route path="/news/:newsId" element={<NewsDetailPage />} />
+
+          // Research Route
+          <Route path="/research" element={<ResearchPage />} />
+          <Route path="/research/:researchId" element={<ResearchDetailPage />} />
 
         </Route>
       </Routes>

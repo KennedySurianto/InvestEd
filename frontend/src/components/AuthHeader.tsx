@@ -93,7 +93,7 @@ export default function AppHeader() {
             <Link to="/news-category" className="text-muted-foreground hover:text-primary transition-colors">
                 News
             </Link>
-            <Link to="/researches" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link to="/research" className="text-muted-foreground hover:text-primary transition-colors">
                 Researches
             </Link>
             <Link to="/forum" className="text-muted-foreground hover:text-primary transition-colors">
