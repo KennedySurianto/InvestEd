@@ -15,6 +15,7 @@ import ResearchPage from './pages/Research';
 import ResearchDetailPage from './pages/ResearchDetail';
 import ForumsPage from './pages/Forum';
 import ForumDetailPage from './pages/ForumDetail';
+import CreateForumPage from './pages/CreateForum';
 
 import './App.css';
 
@@ -44,6 +45,7 @@ function App() {
 
           // Forum Routes
           <Route path="/forum" element={<ForumsPage />} />
+          <Route path="/forum/create" element={<CreateForumPage />} />
           <Route path="/forum/:forumId" element={<ForumDetailPage />} />
 
         </Route>

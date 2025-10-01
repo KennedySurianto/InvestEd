@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ForumThread } from "@/models/Forum";
+import { PlusCircle } from "lucide-react";
 
 type PaginatedResponse = {
     data: ForumThread[];
@@ -142,13 +143,21 @@ export default function ForumsPage() {
                 <h1 className="text-2xl font-semibold">Forums</h1>
                 <p className="mt-1 text-muted-foreground">Discuss strategies and market news.</p>
             </div>
-            <Input
-                type="search"
-                placeholder="Search threads..."
-                className="w-full sm:max-w-xs"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="flex w-full items-center gap-2 sm:w-auto">
+                <Input
+                    type="search"
+                    placeholder="Search threads..."
+                    className="w-full sm:max-w-xs"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Link to="/forum/create">
+                    <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Create Thread
+                    </Button>
+                </Link>
+            </div>
             </div>
 
             <ul className="mt-6 space-y-3">
