@@ -24,11 +24,11 @@ function Hero() {
           </div>
         </div>
 
-        <div className="mt-12 md:mt-16 rounded-xl border border-border/50 overflow-hidden">
+        <div className="mt-12 md:mt-16 rounded-xl border border-border/50 overflow-hidden h-140">
           <img
-            src="/images/ref-hero.png"
+            src="/images/hero.png"
             alt="InvestEd studio-style hero reference"
-            className="w-full h-auto object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
@@ -106,7 +106,7 @@ function ModulesReference() {
       <div className="mx-auto max-w-6xl px-4 grid md:grid-cols-2 gap-10 items-center">
         <div className="rounded-xl overflow-hidden border border-border/50">
           <img
-            src="/images/ref-modules-1.png"
+            src="/images/learning.png"
             alt="Learning modules reference"
             className="w-full h-auto object-cover"
           />
@@ -156,7 +156,7 @@ function ModulesReference() {
         </div>
         <div className="order-1 md:order-2 rounded-xl overflow-hidden border border-border/50">
           <img
-            src="/images/ref-modules-2.png"
+            src="/images/live.png"
             alt="Timeline and insights reference"
             className="w-full h-auto object-cover"
           />
