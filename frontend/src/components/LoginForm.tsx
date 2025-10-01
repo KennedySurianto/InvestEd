@@ -27,10 +27,31 @@ export default function LoginForm() {
 
     try {
       setSubmitting(true)
-      // Simulate auth; replace with real API call when ready.
-      await new Promise((r) => setTimeout(r, 600))
+      
+      const response = await fetch("http://localhost:3000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        // Use the error message from the API if available
+        throw new Error(data.message || "An error occurred during login.")
+      }
+
+      // On successful login, store the token and navigate
+      localStorage.setItem("token", data.token)
+
       showToast({ title: "Logged in", description: "Welcome back!", type: "success" })
-      navigate("/")
+      navigate("/home")
+    } catch (err: any) {
+      console.error("Login error:", err)
+      setError(err.message || "An unexpected error occurred.")
+      showToast({ title: "Login Failed", description: err.message || "Please try again.", type: "error" }) 
     } finally {
       setSubmitting(false)
     }

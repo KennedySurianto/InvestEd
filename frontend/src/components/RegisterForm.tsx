@@ -95,18 +95,51 @@ export default function RegisterForm() {
 
     try {
       setSubmitting(true)
-      // Here you would call your API to create the account.
-      // We just show a success toast for now.
-      await new Promise((r) => setTimeout(r, 600))
+      
+      const response = await fetch("http://localhost:3000/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          full_name: fullName,
+          email: email,
+          password: password,
+          membership_plan: membership,
+        }),
+      })
 
+      // The API should respond with JSON, even for errors
+      const data = await response.json()
+
+      if (!response.ok) {
+        // If the API returns a specific error message, display it.
+        // Otherwise, throw a generic error.
+        showToast({
+          title: "Registration Failed",
+          description: data.message || "An error occurred during registration.",
+          type: "error",
+        })
+
+        throw new Error(data.message || "An error occurred during registration.")
+      }
+
+      // On success, show a confirmation toast
       showToast({
         title: "Welcome to InvestEd!",
         description: `Account for ${fullName} created with ${PLAN_LABELS[membership]} access.`,
         type: "success",
       })
 
-      // Navigate to a post-register page (placeholder: home)
-      navigate("/")
+      navigate("/home")
+    } catch (err: any) {
+      console.error("Registration error:", err)
+      setError(err.message || "An unexpected error occurred.")
+      showToast({
+        title: "Registration Failed",
+        description: err.message || "Please try again.",
+        type: "error",
+      })
     } finally {
       setSubmitting(false)
     }

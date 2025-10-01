@@ -1,11 +1,11 @@
 import { SectionCard } from "@/components/SectionCard"
-import SiteHeader from "@/components/SiteHeader"
+import AuthHeader from "@/components/AuthHeader"
 
 export default function Home() {
   return (
     <>
       {/* Using the shared sticky header */}
-      <SiteHeader />
+      <AuthHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-8">
         <header className="mb-8">
@@ -23,32 +23,32 @@ export default function Home() {
             <SectionCard
               title="Course Categories"
               description="Browse categories, discover courses, and dive into detailed lessons."
-              href="/home/courses"
+              href="/course-category"
             />
             <SectionCard
               title="News"
               description="Follow market news by category and catch up with the latest headlines."
-              href="/home/news"
+              href="/news-category"
             />
             <SectionCard
               title="My Enrollments"
               description="Review and manage the courses you’re enrolled in."
-              href="/home/enrollments"
+              href="/enrollments"
             />
             <SectionCard
               title="Lesson Completions"
               description="Track which lessons you’ve completed and what’s next."
-              href="/home/completions"
+              href="/completions"
             />
             <SectionCard
               title="Research"
               description="Explore research notes, analyses, and custom watchlists."
-              href="/home/research"
+              href="/research"
             />
             <SectionCard
               title="Forums"
               description="Join community discussions and share your insights."
-              href="/home/forums"
+              href="/forums"
             />
           </div>
         </section>
