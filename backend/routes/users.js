@@ -79,7 +79,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials.' });
         }
 
-        const payload = { userId: user.user_id, email: user.email, role: user.role };
+        const payload = { userId: user.user_id, full_name: user.full_name, email: user.email, role: user.role };
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
         
         // A user is a member if their expiration is NULL (lifetime) or in the future.

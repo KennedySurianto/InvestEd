@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input" // Assuming you have this
 import { Button } from "@/components/ui/button" // Assuming you have this
 import { useToast } from "@/hooks/useToast"
 import { type NewsCategory } from "@/models/NewsCategory"
+import { PlusCircle } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 
 // The API response for pagination will be structured like this
 type PaginatedResponse = {
@@ -32,6 +34,9 @@ export default function NewsCategoriesPage() {
     const limit = 8; // Items per page
 
     const { showToast } = useToast();
+    const { user } = useAuth();
+
+    console.log("User in NewsCategoriesPage:", user); // Debugging line
 
     // Debounce the search term to avoid excessive API calls
     useEffect(() => {
@@ -130,13 +135,25 @@ export default function NewsCategoriesPage() {
                 <h1 className="text-2xl font-semibold">News Categories</h1>
                 <p className="mt-1 text-muted-foreground">Explore market news by your favorite category.</p>
             </div>
-            <Input
-                type="search"
-                placeholder="Search categories (e.g., 'market')..."
-                className="w-full sm:max-w-xs"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="flex w-full items-center gap-2 sm:w-auto">
+                <Input
+                    type="search"
+                    placeholder="Search categories..."
+                    className="w-full sm:max-w-xs h-10"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                
+                {/* Conditionally render the button ONLY if the user is an admin */}
+                {user?.role === 'admin' && (
+                    <Link to="/admin/news-categories/create">
+                        <Button className="h-10">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Create
+                        </Button>
+                    </Link>
+                )}
+            </div>
             </div>
 
             {error && <p className="mt-6 rounded-md border border-destructive bg-card p-4 text-center text-sm text-destructive">Error: {error}</p>}

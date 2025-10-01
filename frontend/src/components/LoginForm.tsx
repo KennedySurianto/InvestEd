@@ -6,12 +6,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/useToast"
 import HoldToRevealPassword from "@/components/HoldToRevealPassword"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function LoginForm() {
   const navigate = useNavigate()
   const { showToast } = useToast()
   const [submitting, setSubmitting] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+
+  const { login } = useAuth();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -43,8 +46,7 @@ export default function LoginForm() {
         throw new Error(data.message || "An error occurred during login.")
       }
 
-      // On successful login, store the token and navigate
-      localStorage.setItem("token", data.token)
+      login(data.token);
 
       showToast({ title: "Logged in", description: "Welcome back!", type: "success" })
       navigate("/home")

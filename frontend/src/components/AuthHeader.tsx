@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,13 +9,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Skeleton } from "@/components/ui/skeleton"
-
-// Define a type for the user profile data for better type safety
-interface UserProfile {
-    fullName: string
-    email: string
-}
+import { useAuth } from "@/contexts/AuthContext"
 
 // A helper function to generate avatar fallbacks from a name
 const getInitials = (name: string = "") => {
@@ -29,52 +22,12 @@ const getInitials = (name: string = "") => {
 }
 
 export default function AppHeader() {
-    const [user, setUser] = useState<UserProfile | null>(null)
-    const [loading, setLoading] = useState(true)
-    const navigate = useNavigate()
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-        // Assumes the auth token is stored in localStorage after login
-        const token = localStorage.getItem("token")
-
-        if (!token) {
-            navigate("/login") // Redirect to login if no token is found
-            return
-        }
-
-        try {
-            const response = await fetch("http://localhost:3000/api/users/profile", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            })
-
-            if (!response.ok) {
-            // If the token is invalid or expired, the server might return 401 or 403
-            if (response.status === 401 || response.status === 403) {
-                localStorage.removeItem("token") // Clear invalid token
-                navigate("/login")
-            }
-            throw new Error("Failed to fetch user profile.")
-            }
-
-            const data: UserProfile = await response.json()
-            setUser(data)
-        } catch (error) {
-            console.error("Profile fetch error:", error)
-            // Handle other potential errors, maybe show a toast notification
-        } finally {
-            setLoading(false)
-        }
-        }
-
-        fetchProfile()
-    }, [navigate])
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem("token")
-        navigate("/login")
+        logout();
+        navigate('/login');
     }
 
     return (
@@ -103,22 +56,20 @@ export default function AppHeader() {
 
             {/* Right Side: Profile Dropdown */}
             <div className="flex items-center gap-4">
-            {loading ? (
-                <Skeleton className="h-9 w-9 rounded-full" />
-            ) : user ? (
+            {user && (
                 <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                     <Avatar className="h-9 w-9">
-                        <AvatarImage src="" alt={`@${user.fullName}`} />
-                        <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
+                        <AvatarImage src="" alt={`@${user.full_name}`} />
+                        <AvatarFallback>{getInitials(user.full_name)}</AvatarFallback>
                     </Avatar>
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{user.fullName}</p>
+                        <p className="text-sm font-medium leading-none">{user.full_name}</p>
                         <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                     </div>
                     </DropdownMenuLabel>
@@ -138,7 +89,7 @@ export default function AppHeader() {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
                 </DropdownMenu>
-            ) : null}
+            )}
             </div>
         </div>
         </header>
