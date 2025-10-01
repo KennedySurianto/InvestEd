@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { HashLink } from "react-router-hash-link"
 import { Button } from "@/components/ui/button"
 
 export default function SiteHeader() {
@@ -9,18 +10,18 @@ export default function SiteHeader() {
           <span className="text-primary">Invest</span>Ed
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link to="/#features" className="hover:text-primary">
+          <HashLink smooth to="/#features" className="hover:text-primary">
             Features
-          </Link>
-          <Link to="/#modules" className="hover:text-primary">
+          </HashLink>
+          <HashLink smooth to="/#modules" className="hover:text-primary">
             Modules
-          </Link>
-          <Link to="/#pricing" className="hover:text-primary">
+          </HashLink>
+          <HashLink smooth to="/#pricing" className="hover:text-primary">
             Pricing
-          </Link>
-          <Link to="/#community" className="hover:text-primary">
+          </HashLink>
+          <HashLink smooth to="/#community" className="hover:text-primary">
             Community
-          </Link>
+          </HashLink>
         </nav>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" className="hidden md:inline-flex">

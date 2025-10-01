@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { HashLink } from "react-router-hash-link"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -253,19 +254,19 @@ function Footer() {
           <div className="font-semibold mb-2">Explore</div>
           <ul className="space-y-1 text-muted-foreground">
             <li>
-              <Link to="#features" className="hover:text-primary">
+              <HashLink smooth to="#features" className="hover:text-primary">
                 Features
-              </Link>
+              </HashLink>
             </li>
             <li>
-              <Link to="#modules" className="hover:text-primary">
+              <HashLink smooth to="#modules" className="hover:text-primary">
                 Modules
-              </Link>
+              </HashLink>
             </li>
             <li>
-              <Link to="#pricing" className="hover:text-primary">
+              <HashLink smooth to="#pricing" className="hover:text-primary">
                 Pricing
-              </Link>
+              </HashLink>
             </li>
           </ul>
         </div>
