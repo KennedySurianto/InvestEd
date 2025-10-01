@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ResearchArticle } from "@/models/Research";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { PlusCircle } from "lucide-react";
 
 type PaginatedResponse = {
     data: ResearchArticle[];
@@ -26,6 +28,8 @@ export default function ResearchPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const limit = 10; // Articles per page
+
+    const { user } = useAuth();
 
     // --- Debounce search input to avoid excessive API calls ---
     useEffect(() => {
@@ -135,13 +139,23 @@ export default function ResearchPage() {
                 <h1 className="text-2xl font-semibold">Research</h1>
                 <p className="mt-1 text-muted-foreground">Analyst notes, watchlists, and reports.</p>
             </div>
-            <Input
-                type="search"
-                placeholder="Search by title, symbol..."
-                className="w-full sm:max-w-xs"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="flex w-full items-center gap-2 sm:w-auto">
+                <Input
+                    type="search"
+                    placeholder="Search by title, symbol..."
+                    className="w-full sm:max-w-xs"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {user?.role === 'admin' && (
+                    <Link to="/admin/research/create">
+                        <Button>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Create
+                        </Button>
+                    </Link>
+                )}
+            </div>
             </div>
 
             <ul className="mt-6 space-y-3">

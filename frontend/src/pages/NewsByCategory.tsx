@@ -1,4 +1,4 @@
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AuthHeader from "@/components/AuthHeader";
 import { Input } from "@/components/ui/input";
@@ -151,7 +151,6 @@ export default function NewsByCategoryPage() {
     >
       <Link
         to={`/news/${article.news_id}`}
-        state={{ categoryId: categoryId, categoryName: categoryName }} // Pass state for breadcrumbs
         className="block p-4 cursor-pointer" // Make the link fill the card
       >
         <p className="font-medium">{article.title}</p>

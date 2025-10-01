@@ -21,6 +21,7 @@ import ProfilePage from './pages/Profile';
 import AdminRoute from './components/AdminRoute';
 import CreateNewsCategory from './pages/Admin/CreateNewsCategory';
 import CreateNews from './pages/Admin/CreateNews';
+import CreateResearchPage from './pages/Admin/CreateResearch';
 
 import './App.css';
 
@@ -61,6 +62,7 @@ function App() {
         <Route path="/admin" element={<AdminRoute />}>
           <Route path="news-categories/create" element={<CreateNewsCategory />} />
           <Route path="news/create" element={<CreateNews />} />
+          <Route path="research/create" element={<CreateResearchPage />} />
         </Route>
       </Routes>
     </ToastProvider>
