@@ -1,10 +1,12 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import SiteHeader from "@/components/SiteHeader";
-import { Input } from "@/components/ui/input"; // Assuming you have these UI components
-import { Button } from "@/components/ui/button"; // Assuming you have these UI components
-import { Skeleton } from "@/components/ui/skeleton"; // Assuming you have these UI components
+import AuthHeader from "@/components/AuthHeader";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { NewsArticle } from "@/models/News";
+import { PlusCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Define the structure of the API's paginated response
 type PaginatedNewsResponse = {
@@ -18,8 +20,7 @@ type PaginatedNewsResponse = {
 
 export default function NewsByCategoryPage() {
   const { categoryId } = useParams<{ categoryId: string }>();
-  const location = useLocation();
-  const categoryName = location.state?.categoryName || categoryId;
+  const [categoryName, setCategoryName] = useState<string>(""); 
 
   const [list, setList] = useState<NewsArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +32,39 @@ export default function NewsByCategoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10; // Number of articles per page
+
+  const { user } = useAuth();
+
+  // --- Fetch Category Name from API ---
+  useEffect(() => {
+    if (!categoryId) return;
+
+    const fetchCategoryName = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("Authentication token not found.");
+        }
+
+        // This public route does not require a token
+        const response = await fetch(`http://localhost:3000/api/news-categories/${categoryId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+        const data = await response.json();
+        setCategoryName(data.category_name);
+        } else {
+        // If the category can't be found, fall back to displaying the ID.
+        setCategoryName(`Category ${categoryId}`);
+        }
+      } catch (err) {
+        console.error("Failed to fetch category name:", err);
+        setCategoryName(`Category ${categoryId}`); // Fallback on network error
+      }
+    };
+
+    fetchCategoryName();
+  }, [categoryId]);
 
   // --- Debounce search input ---
   useEffect(() => {
@@ -140,7 +174,7 @@ export default function NewsByCategoryPage() {
 
   return (
     <>
-      <SiteHeader />
+      <AuthHeader />
       <main className="mx-auto max-w-5xl px-4 py-8">
         <nav className="text-sm text-muted-foreground">
           <Link to="/news-category" className="hover:underline underline-offset-4">
@@ -160,13 +194,27 @@ export default function NewsByCategoryPage() {
               ? `Results for “${debouncedSearchTerm}”` 
               : `Latest in “${categoryName}”`}
           </h1>
-          <Input
-            type="search"
-            placeholder="Search all articles..."
-            className="w-full sm:max-w-xs"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <Input
+              type="search"
+              placeholder="Search all articles..."
+              className="w-full sm:max-w-xs"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {/* 5. Conditionally render the button for admins */}
+            {user?.role === 'admin' && (
+                <Link 
+                  to="/admin/news/create" 
+                  state={{ categoryId: categoryId, categoryName: categoryName }}
+                >
+                  <Button>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Create
+                  </Button>
+                </Link>
+            )}
+          </div>
         </div>
 
         <ul className="mt-6 space-y-4">{renderContent()}</ul>

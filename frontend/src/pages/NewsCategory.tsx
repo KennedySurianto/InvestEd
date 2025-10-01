@@ -36,8 +36,6 @@ export default function NewsCategoriesPage() {
     const { showToast } = useToast();
     const { user } = useAuth();
 
-    console.log("User in NewsCategoriesPage:", user); // Debugging line
-
     // Debounce the search term to avoid excessive API calls
     useEffect(() => {
         const timerId = setTimeout(() => {
@@ -53,49 +51,48 @@ export default function NewsCategoriesPage() {
     // Fetch data when page or debounced search term changes
     useEffect(() => {
         const fetchCategories = async () => {
-        setLoading(true);
-        setError(null);
-        
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-            throw new Error("Authentication token not found.");
+            setLoading(true);
+            setError(null);
+            
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error("Authentication token not found.");
+                }
+
+                let url = "";
+                // Decide which endpoint to use
+                if (debouncedSearchTerm) {
+                    url = `http://localhost:3000/api/news-categories/search?q=${debouncedSearchTerm}`;
+                } else {
+                    url = `http://localhost:3000/api/news-categories?page=${currentPage}&limit=${limit}`;
+                }
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Handle different response structures
+                if (debouncedSearchTerm) {
+                    setCategories(data);
+                    setTotalPages(1); // Search results are not paginated in this implementation
+                } else {
+                    const paginatedData = data as PaginatedResponse;
+                    setCategories(paginatedData.data);
+                    setTotalPages(paginatedData.pagination.totalPages);
+                }
+            } catch (err: any) {
+                setError(err.message);
+                showToast({ title: "Error", description: "Failed to fetch news categories.", type: "error" });
+            } finally {
+                setLoading(false);
             }
-
-            let url = "";
-            // Decide which endpoint to use
-            if (debouncedSearchTerm) {
-            url = `http://localhost:3000/api/news-categories/search?q=${debouncedSearchTerm}`;
-            } else {
-            url = `http://localhost:3000/api/news-categories?page=${currentPage}&limit=${limit}`;
-            }
-
-            const response = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            // Handle different response structures
-            if (debouncedSearchTerm) {
-            setCategories(data);
-            setTotalPages(1); // Search results are not paginated in this implementation
-            } else {
-            const paginatedData = data as PaginatedResponse;
-            setCategories(paginatedData.data);
-            setTotalPages(paginatedData.pagination.totalPages);
-            }
-
-        } catch (err: any) {
-            setError(err.message);
-            showToast({ title: "Error", description: "Failed to fetch news categories.", type: "error" });
-        } finally {
-            setLoading(false);
-        }
         };
 
         fetchCategories();
@@ -139,7 +136,7 @@ export default function NewsCategoriesPage() {
                 <Input
                     type="search"
                     placeholder="Search categories..."
-                    className="w-full sm:max-w-xs h-10"
+                    className="w-full sm:max-w-xs"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -147,7 +144,7 @@ export default function NewsCategoriesPage() {
                 {/* Conditionally render the button ONLY if the user is an admin */}
                 {user?.role === 'admin' && (
                     <Link to="/admin/news-categories/create">
-                        <Button className="h-10">
+                        <Button>
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Create
                         </Button>
@@ -171,7 +168,6 @@ export default function NewsCategoriesPage() {
                     <h2 className="text-lg font-semibold">{c.category_name}</h2>
                     <Link
                     to={`/news-category/${c.category_id}`}
-                    state={{ categoryName: c.category_name }}
                     className="mt-3 inline-block text-sm text-primary underline-offset-4 hover:underline"
                     >
                     View news in this category

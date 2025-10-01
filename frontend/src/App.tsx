@@ -18,6 +18,10 @@ import ForumDetailPage from './pages/ForumDetail';
 import CreateForumPage from './pages/CreateForum';
 import ProfilePage from './pages/Profile';
 
+import AdminRoute from './components/AdminRoute';
+import CreateNewsCategory from './pages/Admin/CreateNewsCategory';
+import CreateNews from './pages/Admin/CreateNews';
+
 import './App.css';
 
 function App() {
@@ -51,6 +55,12 @@ function App() {
 
           // Profile Route
           <Route path="/profile" element={<ProfilePage />} />
+        </Route>
+
+        // Admin Routes
+        <Route path="/admin" element={<AdminRoute />}>
+          <Route path="news-categories/create" element={<CreateNewsCategory />} />
+          <Route path="news/create" element={<CreateNews />} />
         </Route>
       </Routes>
     </ToastProvider>
