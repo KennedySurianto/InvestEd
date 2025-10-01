@@ -2,6 +2,7 @@ import express from 'express';
 import pool from '../database/db.js';
 import authenticateToken from '../middleware/authenticateToken.js';
 import checkMembership from '../middleware/checkMembership.js';
+import jaroWinkler from 'jaro-winkler';
 
 const router = express.Router();
 
@@ -33,15 +34,78 @@ router.post('/', authenticateToken, checkMembership, async (req, res) => {
     }
 });
 
+// GET /api/forums/search
+// Searches forum threads using Jaro-Winkler distance.
+// Query Params: ?q=<searchTerm>&page=<number>&limit=<number>
+router.get('/search', authenticateToken, checkMembership, async (req, res) => {
+    try {
+        const { q: searchTerm } = req.query;
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
+
+        if (!searchTerm || typeof searchTerm !== 'string' || searchTerm.trim() === '') {
+            return res.status(400).json({ message: 'A non-empty search term "q" is required.' });
+        }
+
+        // WARNING: See performance note below.
+        const allThreads = await pool.query(`
+            SELECT 
+                f.forum_id, f.title, f.content, f.created_at,
+                u.full_name AS author_name, u.user_id AS author_id
+            FROM forums f
+            JOIN users u ON f.user_id = u.user_id;
+        `);
+
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+        const scoredThreads = allThreads.rows.map(thread => {
+            const titleScore = jaroWinkler(lowerCaseSearchTerm, thread.title.toLowerCase());
+            const contentSnippet = thread.content.substring(0, 300).toLowerCase();
+            const contentScore = jaroWinkler(lowerCaseSearchTerm, contentSnippet);
+            
+            // Weighted score: a match in the title is more important than in the content.
+            const totalScore = (titleScore * 0.7) + (contentScore * 0.3);
+
+            return { ...thread, similarity: totalScore };
+        });
+
+        const similarityThreshold = 0.7; // Adjust as needed
+        const relevantThreads = scoredThreads
+            .filter(thread => thread.similarity >= similarityThreshold)
+            .sort((a, b) => b.similarity - a.similarity);
+
+        // Manually paginate the filtered and sorted array
+        const totalItems = relevantThreads.length;
+        const totalPages = Math.ceil(totalItems / limit);
+        const offset = (page - 1) * limit;
+        const paginatedData = relevantThreads.slice(offset, offset + limit);
+        
+        res.status(200).json({
+            data: paginatedData,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalItems,
+                limit
+            }
+        });
+
+    } catch (err) {
+        console.error('Search Forums Error:', err.message);
+        res.status(500).json({ message: 'Server error while searching for forum threads.' });
+    }
+});
+
 // GET /api/forums
-// Retrieves a paginated list of all forum threads. Requires active membership.
+// Retrieves a paginated list of all forum threads.
 router.get('/', authenticateToken, checkMembership, async (req, res) => {
     try {
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 10;
         const offset = (page - 1) * limit;
 
-        const query = `
+        // Query for the paginated data
+        const threadsQuery = `
             SELECT 
                 f.forum_id, f.title, f.content, f.created_at,
                 u.full_name AS author_name,
@@ -51,8 +115,29 @@ router.get('/', authenticateToken, checkMembership, async (req, res) => {
             ORDER BY f.created_at DESC
             LIMIT $1 OFFSET $2;
         `;
-        const forums = await pool.query(query, [limit, offset]);
-        res.status(200).json(forums.rows);
+        
+        // Query for the total count
+        const countQuery = 'SELECT COUNT(*) FROM forums;';
+
+        // Execute both queries in parallel for efficiency
+        const [threadsResult, countResult] = await Promise.all([
+            pool.query(threadsQuery, [limit, offset]),
+            pool.query(countQuery)
+        ]);
+        
+        const totalItems = parseInt(countResult.rows[0].count, 10);
+        const totalPages = Math.ceil(totalItems / limit);
+
+        res.status(200).json({
+            data: threadsResult.rows,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: totalItems,
+                limit: limit
+            }
+        });
+
     } catch (err) {
         console.error('Get Forums List Error:', err.message);
         res.status(500).json({ message: 'Server error while retrieving forum threads.' });

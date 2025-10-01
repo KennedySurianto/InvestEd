@@ -13,6 +13,8 @@ import NewsPage from './pages/NewsByCategory';
 import NewsDetailPage from './pages/NewsDetail';
 import ResearchPage from './pages/Research';
 import ResearchDetailPage from './pages/ResearchDetail';
+import ForumsPage from './pages/Forum';
+import ForumDetailPage from './pages/ForumDetail';
 
 import './App.css';
 
@@ -39,6 +41,10 @@ function App() {
           // Research Route
           <Route path="/research" element={<ResearchPage />} />
           <Route path="/research/:researchId" element={<ResearchDetailPage />} />
+
+          // Forum Routes
+          <Route path="/forum" element={<ForumsPage />} />
+          <Route path="/forum/:forumId" element={<ForumDetailPage />} />
 
         </Route>
       </Routes>

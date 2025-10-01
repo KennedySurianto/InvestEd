@@ -40,12 +40,15 @@ router.post('/', authenticateToken, checkMembership, async (req, res) => {
 });
 
 // GET /api/forums/:forumId/replies
-// Retrieves all replies for a specific forum thread.
+// Retrieves paginated replies for a specific forum thread.
 router.get('/', authenticateToken, checkMembership, async (req, res) => {
     try {
         const { forumId } = req.params;
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
+        const offset = (page - 1) * limit;
 
-        const query = `
+        const repliesQuery = `
             SELECT 
                 fr.reply_id, fr.content, fr.parent_reply_id, fr.created_at,
                 u.full_name AS author_name,
@@ -53,10 +56,30 @@ router.get('/', authenticateToken, checkMembership, async (req, res) => {
             FROM forum_replies fr
             JOIN users u ON fr.user_id = u.user_id
             WHERE fr.forum_id = $1
-            ORDER BY fr.created_at ASC;
+            ORDER BY fr.created_at ASC
+            LIMIT $2 OFFSET $3;
         `;
-        const replies = await pool.query(query, [forumId]);
-        res.status(200).json(replies.rows);
+        
+        const countQuery = 'SELECT COUNT(*) FROM forum_replies WHERE forum_id = $1';
+
+        const [repliesResult, countResult] = await Promise.all([
+            pool.query(repliesQuery, [forumId, limit, offset]),
+            pool.query(countQuery, [forumId])
+        ]);
+
+        const totalItems = parseInt(countResult.rows[0].count, 10);
+        const totalPages = Math.ceil(totalItems / limit);
+
+        res.status(200).json({
+            data: repliesResult.rows,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: totalItems,
+                limit: limit
+            }
+        });
+
     } catch (err) {
         console.error('Get Replies Error:', err.message);
         res.status(500).json({ message: 'Server error while retrieving replies.' });
