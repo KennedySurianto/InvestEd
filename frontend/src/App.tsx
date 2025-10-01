@@ -16,6 +16,7 @@ import ResearchDetailPage from './pages/ResearchDetail';
 import ForumsPage from './pages/Forum';
 import ForumDetailPage from './pages/ForumDetail';
 import CreateForumPage from './pages/CreateForum';
+import ProfilePage from './pages/Profile';
 
 import './App.css';
 
@@ -48,6 +49,8 @@ function App() {
           <Route path="/forum/create" element={<CreateForumPage />} />
           <Route path="/forum/:forumId" element={<ForumDetailPage />} />
 
+          // Profile Route
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Routes>
     </ToastProvider>

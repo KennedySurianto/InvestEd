@@ -89,9 +89,9 @@ router.post('/login', async (req, res) => {
             message: 'Logged in successfully!',
             token: token,
             user: {
-                userId: user.user_id,
+                user_id: user.user_id,
                 email: user.email,
-                fullName: user.full_name,
+                full_name: user.full_name,
                 role: user.role,
                 is_member: is_member,
                 membership_expires_at: user.membership_expires_at
@@ -151,8 +151,8 @@ router.put('/profile', authenticateToken, async (req, res) => {
         res.status(200).json({
             message: 'Profile updated successfully!',
             user: {
-                userId: updatedUser.user_id,
-                fullName: updatedUser.full_name,
+                user_id: updatedUser.user_id,
+                full_name: updatedUser.full_name,
                 email: updatedUser.email,
                 role: updatedUser.role,
                 is_member: is_member,
@@ -185,11 +185,11 @@ router.get('/profile', authenticateToken, async (req, res) => {
         const is_member = user.membership_expires_at === null || (user.membership_expires_at && new Date(user.membership_expires_at) > new Date());
 
         res.status(200).json({
-            userId: user.user_id,
-            fullName: user.full_name,
+            user_id: user.user_id,
+            full_name: user.full_name,
             email: user.email,
             role: user.role,
-            createdAt: user.created_at,
+            created_at: user.created_at,
             is_member: is_member,
             membership_expires_at: user.membership_expires_at
         });
