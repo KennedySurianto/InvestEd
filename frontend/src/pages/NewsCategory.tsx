@@ -153,7 +153,7 @@ export default function NewsCategoriesPage() {
                 <li key={c.category_id} className="rounded-lg border bg-card p-5 transition-all hover:shadow-md">
                     <h2 className="text-lg font-semibold">{c.category_name}</h2>
                     <Link
-                    to={`/news/${c.category_id}`}
+                    to={`/news-category/${c.category_id}`}
                     state={{ categoryName: c.category_name }}
                     className="mt-3 inline-block text-sm text-primary underline-offset-4 hover:underline"
                     >

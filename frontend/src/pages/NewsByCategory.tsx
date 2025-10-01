@@ -111,7 +111,15 @@ export default function NewsByCategoryPage() {
     }
 
     return list.map((article) => (
-      <li key={article.news_id} className="rounded-lg border bg-card p-4">
+      <li
+      key={article.news_id}
+      className="rounded-lg border bg-card transition-all hover:shadow-md hover:border-primary/50"
+    >
+      <Link
+        to={`/news/${article.news_id}`}
+        state={{ categoryId: categoryId, categoryName: categoryName }} // Pass state for breadcrumbs
+        className="block p-4 cursor-pointer" // Make the link fill the card
+      >
         <p className="font-medium">{article.title}</p>
         <div className="text-xs text-muted-foreground flex items-center space-x-2 mt-1">
           <span>{article.author_name}</span>
@@ -122,8 +130,11 @@ export default function NewsByCategoryPage() {
             })}
           </span>
         </div>
-        <p className="mt-2 text-sm leading-relaxed">{article.content}</p>
-      </li>
+        <p className="mt-2 text-sm leading-relaxed line-clamp-2">
+          {article.content}
+        </p>
+      </Link>
+    </li>
     ));
   };
 
