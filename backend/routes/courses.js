@@ -90,14 +90,125 @@ router.delete('/:id', authenticateToken, checkAdmin, async (req, res) => {
     }
 });
 
-
 // --- Member-Facing Routes for Viewing Courses ---
 
-// GET /api/courses (For Members)
-// Retrieves the public catalog of all courses.
+// GET /api/courses/category/:categoryId (For Members) - NEW
+// Retrieves paginated courses for a specific category.
+router.get('/category/:categoryId', authenticateToken, checkMembership, async (req, res) => {
+    try {
+        const { categoryId } = req.params;
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
+        const offset = (page - 1) * limit;
+
+        const coursesQuery = `
+            SELECT 
+                c.course_id, c.title, c.description, 
+                cc.category_name, u.full_name AS author_name
+            FROM courses c
+            JOIN course_categories cc ON c.category_id = cc.category_id
+            JOIN users u ON c.author_id = u.user_id
+            WHERE c.category_id = $1
+            ORDER BY c.created_at DESC
+            LIMIT $2 OFFSET $3;
+        `;
+        
+        const countQuery = 'SELECT COUNT(*) FROM courses WHERE category_id = $1;';
+
+        const [coursesResult, countResult] = await Promise.all([
+            pool.query(coursesQuery, [categoryId, limit, offset]),
+            pool.query(countQuery, [categoryId])
+        ]);
+
+        const totalItems = parseInt(countResult.rows[0].count, 10);
+        const totalPages = Math.ceil(totalItems / limit);
+
+        res.status(200).json({
+            data: coursesResult.rows,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalItems,
+                limit
+            }
+        });
+
+    } catch (err) {
+        console.error('Get Courses by Category Error:', err.message);
+        res.status(500).json({ message: 'Server error while retrieving courses for this category.' });
+    }
+});
+
+// GET /api/courses/search (For Members) - NEW
+// Searches courses using Jaro-Winkler distance.
+router.get('/search', authenticateToken, checkMembership, async (req, res) => {
+    try {
+        const { q: searchTerm } = req.query;
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
+
+        if (!searchTerm || typeof searchTerm !== 'string' || searchTerm.trim() === '') {
+            return res.status(400).json({ message: 'A non-empty search term "q" is required.' });
+        }
+
+        // This query fetches all courses and can be slow on large datasets.
+        const allCoursesQuery = `
+            SELECT 
+                c.course_id, c.title, c.description, 
+                cc.category_name, u.full_name AS author_name
+            FROM courses c
+            JOIN course_categories cc ON c.category_id = cc.category_id
+            JOIN users u ON c.author_id = u.user_id;
+        `;
+        const allCoursesResult = await pool.query(allCoursesQuery);
+        
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+        const scoredCourses = allCoursesResult.rows.map(course => {
+            const titleScore = jaroWinkler(lowerCaseSearchTerm, course.title.toLowerCase());
+            const descScore = course.description ? jaroWinkler(lowerCaseSearchTerm, course.description.toLowerCase()) : 0;
+            
+            // Weighted score gives more importance to the title.
+            const totalScore = (titleScore * 0.7) + (descScore * 0.3);
+            return { ...course, similarity: totalScore };
+        });
+
+        const similarityThreshold = 0.7;
+        const relevantCourses = scoredCourses
+            .filter(course => course.similarity >= similarityThreshold)
+            .sort((a, b) => b.similarity - a.similarity);
+
+        // Manually paginate the in-memory results
+        const totalItems = relevantCourses.length;
+        const totalPages = Math.ceil(totalItems / limit);
+        const offset = (page - 1) * limit;
+        const paginatedData = relevantCourses.slice(offset, offset + limit);
+
+        res.status(200).json({
+            data: paginatedData,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalItems,
+                limit
+            }
+        });
+
+    } catch (err) {
+        console.error('Search Courses Error:', err.message);
+        res.status(500).json({ message: 'Server error while searching for courses.' });
+    }
+});
+
+// GET /api/courses (For Members) - UPDATED with Pagination
+// Retrieves a paginated list of all courses.
 router.get('/', authenticateToken, checkMembership, async (req, res) => {
     try {
-        const query = `
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
+        const offset = (page - 1) * limit;
+
+        const coursesQuery = `
             SELECT 
                 c.course_id, 
                 c.title, 
@@ -107,16 +218,35 @@ router.get('/', authenticateToken, checkMembership, async (req, res) => {
             FROM courses c
             JOIN course_categories cc ON c.category_id = cc.category_id
             JOIN users u ON c.author_id = u.user_id
-            ORDER BY c.created_at DESC;
+            ORDER BY c.created_at DESC
+            LIMIT $1 OFFSET $2;
         `;
-        const allCourses = await pool.query(query);
-        res.status(200).json(allCourses.rows);
+        
+        const countQuery = 'SELECT COUNT(*) FROM courses;';
+
+        const [coursesResult, countResult] = await Promise.all([
+            pool.query(coursesQuery, [limit, offset]),
+            pool.query(countQuery)
+        ]);
+
+        const totalItems = parseInt(countResult.rows[0].count, 10);
+        const totalPages = Math.ceil(totalItems / limit);
+
+        res.status(200).json({
+            data: coursesResult.rows,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: totalItems,
+                limit: limit
+            }
+        });
+
     } catch (err) {
         console.error('Get Courses Error:', err.message);
         res.status(500).json({ message: 'Server error while retrieving courses.' });
     }
 });
-
 
 // GET /api/courses/:id (For Members)
 // Retrieves a single course with all its lessons.
@@ -130,6 +260,7 @@ router.get('/:id', authenticateToken, checkMembership, async (req, res) => {
                 c.course_id, 
                 c.title, 
                 c.description, 
+                c.category_id,
                 cc.category_name, 
                 u.full_name AS author_name
             FROM courses c

@@ -40,7 +40,7 @@ export default function AppHeader() {
 
             {/* Middle: Authenticated Navigation */}
             <nav className="hidden md:flex items-center gap-6 text-sm">
-            <Link to="/courses" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link to="/course-category" className="text-muted-foreground hover:text-primary transition-colors">
                 Courses
             </Link>
             <Link to="/news-category" className="text-muted-foreground hover:text-primary transition-colors">

@@ -17,13 +17,19 @@ import ForumsPage from './pages/Forum';
 import ForumDetailPage from './pages/ForumDetail';
 import CreateForumPage from './pages/CreateForum';
 import ProfilePage from './pages/Profile';
+import CourseCategoriesPage from './pages/CourseCategory';
+import CoursesByCategoryPage from './pages/CoursesByCategory';
 
 import AdminRoute from './components/AdminRoute';
 import CreateNewsCategory from './pages/Admin/CreateNewsCategory';
 import CreateNews from './pages/Admin/CreateNews';
 import CreateResearchPage from './pages/Admin/CreateResearch';
+import CreateCourseCategoryPage from './pages/Admin/CreateCourseCategory';
+import CreateCoursePage from './pages/Admin/CreateCourse';
+import CreateCourseLessonPage from './pages/Admin/CreateCourseLesson';
 
 import './App.css';
+import CourseDetailPage from './pages/CourseDetail';
 
 function App() {
   return (
@@ -56,6 +62,11 @@ function App() {
 
           // Profile Route
           <Route path="/profile" element={<ProfilePage />} />
+
+          // Course Routes
+          <Route path="/course-category" element={<CourseCategoriesPage />} />
+          <Route path="/course-category/:categoryId" element={<CoursesByCategoryPage />} />
+          <Route path="/course/:courseId" element={<CourseDetailPage />} />
         </Route>
 
         // Admin Routes
@@ -63,6 +74,9 @@ function App() {
           <Route path="news-categories/create" element={<CreateNewsCategory />} />
           <Route path="news/create" element={<CreateNews />} />
           <Route path="research/create" element={<CreateResearchPage />} />
+          <Route path="course-category/create" element={<CreateCourseCategoryPage />} />
+          <Route path="course/create" element={<CreateCoursePage />} />
+          <Route path="course/:courseId/lesson/create" element={<CreateCourseLessonPage />} />
         </Route>
       </Routes>
     </ToastProvider>
