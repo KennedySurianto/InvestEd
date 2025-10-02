@@ -184,9 +184,9 @@ export default function CourseDetailPage() {
         <AuthHeader />
         <main className="mx-auto max-w-6xl px-4 py-8">
             <nav className="text-sm text-muted-foreground mb-4">
-            <Link to="/course-categories" className="hover:underline">Course Categories</Link>
+            <Link to="/course-category" className="hover:underline">Course Categories</Link>
             {" / "}
-            <Link to={`/courses/category/${course.category_id}`} className="hover:underline">
+            <Link to={`/course-category/${course.category_id}`} className="hover:underline">
                 {course.category_name}
             </Link>
             </nav>
