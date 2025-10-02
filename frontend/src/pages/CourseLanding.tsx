@@ -109,7 +109,7 @@ export default function CourseLandingPage() {
                 <AuthHeader />
                 <main className="mx-auto max-w-5xl px-4 py-8 text-center">
                     <p className="text-destructive">{error || "This course could not be found."}</p>
-                    <Link to="/course-categories" className="mt-4 inline-block">
+                    <Link to="/course-category" className="mt-4 inline-block">
                         <Button variant="outline">Back to Categories</Button>
                     </Link>
                 </main>
@@ -122,7 +122,7 @@ export default function CourseLandingPage() {
         <AuthHeader />
         <main className="mx-auto max-w-5xl px-4 py-8">
             <nav className="text-sm text-muted-foreground mb-4">
-            <Link to="/course-categories" className="hover:underline">Course Categories</Link>
+            <Link to="/course-category" className="hover:underline">Course Categories</Link>
             {" / "}
             <Link to={`/course-category/${course.category_id}`} className="hover:underline">
                 {course.category_name}

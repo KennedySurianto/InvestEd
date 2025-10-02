@@ -2,6 +2,7 @@ import express from 'express';
 import pool from '../database/db.js';
 import authenticateToken from '../middleware/authenticateToken.js';
 import checkAdmin from '../middleware/checkAdmin.js';
+import jaroWinkler from 'jaro-winkler';
 
 const router = express.Router();
 
