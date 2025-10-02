@@ -74,4 +74,32 @@ router.get('/my-enrollments', async (req, res) => {
     }
 });
 
+// --- In a relevant router file like routes/enrollments.js ---
+
+// GET /api/enrollments/course/:courseId/completed-lessons
+// Retrieves a list of completed lesson IDs for the current user in a specific course.
+router.get('/enrollments/course/:courseId/completed-lessons', authenticateToken, async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        const userId = req.user.userId;
+
+        const query = `
+            SELECT ulc.lesson_id 
+            FROM user_lesson_completion ulc
+            JOIN course_lessons cl ON ulc.lesson_id = cl.lesson_id
+            WHERE ulc.user_id = $1 AND cl.course_id = $2;
+        `;
+        const completedResult = await pool.query(query, [userId, courseId]);
+
+        // Return a simple array of lesson IDs for easy lookup on the frontend
+        const completedLessonIds = completedResult.rows.map(row => row.lesson_id);
+        
+        res.status(200).json(completedLessonIds);
+
+    } catch (err) {
+        console.error('Get Completed Lessons Error:', err.message);
+        res.status(500).json({ message: 'Server error while retrieving lesson progress.' });
+    }
+});
+
 export default router;
