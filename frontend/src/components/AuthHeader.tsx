@@ -52,6 +52,9 @@ export default function AppHeader() {
             <Link to="/forum" className="text-muted-foreground hover:text-primary transition-colors">
                 Forum
             </Link>
+            <Link to="/enrollments" className="text-muted-foreground hover:text-primary transition-colors">
+                Enrollments
+            </Link>
             </nav>
 
             {/* Right Side: Profile Dropdown */}

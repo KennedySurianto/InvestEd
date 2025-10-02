@@ -20,6 +20,7 @@ import ProfilePage from './pages/Profile';
 import CourseCategoriesPage from './pages/CourseCategory';
 import CoursesByCategoryPage from './pages/CoursesByCategory';
 import CourseLanding from './pages/CourseLanding';
+import Enrollments from './pages/Enrollments';
 
 import AdminRoute from './components/AdminRoute';
 import CreateNewsCategory from './pages/Admin/CreateNewsCategory';
@@ -69,6 +70,7 @@ function App() {
           <Route path="/course-category/:categoryId" element={<CoursesByCategoryPage />} />
           <Route path="/course/:courseId" element={<CourseLanding />} />
           <Route path="/course/:courseId/learn" element={<CourseDetailPage />} />
+          <Route path="/enrollments" element={<Enrollments />} />
         </Route>
 
         // Admin Routes
