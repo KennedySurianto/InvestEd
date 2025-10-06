@@ -21,7 +21,9 @@ function Hero() {
             <Button asChild className="bg-primary text-primary-foreground hover:opacity-90">
               <Link to="/register">Start Learning</Link>
             </Button>
-            <Button variant="outline">Browse Courses</Button>
+            <Button variant="outline">
+              <HashLink smooth to="#modules">Browse Courses</HashLink>
+            </Button>
           </div>
         </div>
 
