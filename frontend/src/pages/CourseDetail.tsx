@@ -7,6 +7,36 @@ import type { CourseLesson } from "@/models/CourseLesson";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Circle } from "lucide-react";
 
+// Helper function to get YouTube embed URL from various YouTube link formats
+const getYouTubeEmbedUrl = (url: string | undefined): string | null => {
+    if (!url) return null;
+
+    let videoId: string | null = null;
+    try {
+        const urlObj = new URL(url);
+        const hostname = urlObj.hostname;
+        
+        if (hostname.includes("youtube.com")) {
+            videoId = urlObj.searchParams.get("v");
+        } else if (hostname.includes("youtu.be")) {
+            videoId = urlObj.pathname.split('/')[1];
+            if (videoId && videoId.includes('?')) {
+                videoId = videoId.split('?')[0];
+            }
+        }
+    } catch (e) {
+        console.error("Invalid video URL provided:", url);
+        return null;
+    }
+
+    if (videoId) {
+        // Append ?rel=0 to the end of the URL
+        return `https://www.youtube.com/embed/${videoId}?rel=0`;
+    }
+    
+    return null;
+};
+
 export default function CourseDetailPage() {
     const { courseId } = useParams<{ courseId: string }>();
 
@@ -99,21 +129,8 @@ export default function CourseDetailPage() {
             return <p className="text-muted-foreground">Select a lesson to begin.</p>;
         }
         
-        // Check if the video URL is a YouTube link to create an embeddable URL
-        let videoEmbedUrl = null;
-        if (selectedLesson.video_url) {
-            try {
-                const url = new URL(selectedLesson.video_url);
-                if (url.hostname === "www.youtube.com" || url.hostname === "youtube.com") {
-                const videoId = url.searchParams.get("v");
-                if (videoId) {
-                    videoEmbedUrl = `https://www.youtube.com/embed/${videoId}`;
-                }
-                }
-            } catch (e) {
-                console.error("Invalid video URL:", selectedLesson.video_url);
-            }
-        }
+        // Use the helper function here
+        const videoEmbedUrl = getYouTubeEmbedUrl(selectedLesson.video_url);
 
         return (
             <div className="prose dark:prose-invert max-w-none">
@@ -121,12 +138,12 @@ export default function CourseDetailPage() {
                 {videoEmbedUrl && (
                 <div className="aspect-video w-full rounded-lg overflow-hidden my-4">
                     <iframe
-                    src={videoEmbedUrl}
-                    title={selectedLesson.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
+                        src={videoEmbedUrl} // Use the correctly formatted embed URL
+                        title={selectedLesson.title}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full"
                     ></iframe>
                 </div>
                 )}
