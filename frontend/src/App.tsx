@@ -32,58 +32,61 @@ import CreateCourseLessonPage from './pages/Admin/CreateCourseLesson';
 
 import './App.css';
 import CourseDetailPage from './pages/CourseDetail';
+import { ThemeProvider } from './components/ThemeProvider';
 
 function App() {
   return (
-    <ToastProvider>
-      <Routes>
-        // Guest Routes
-        <Route element={<GuestRoute />}>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Route>
+    <ThemeProvider>
+      <ToastProvider>
+        <Routes>
+          // Guest Routes
+          <Route element={<GuestRoute />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
 
-        // Authenticated Routes
-        <Route element={<ProtectedRoute />}>
-          <Route path="/home" element={<Home />} />
+          // Authenticated Routes
+          <Route element={<ProtectedRoute />}>
+            <Route path="/home" element={<Home />} />
 
-          // News Routes
-          <Route path='/news-category' element={<NewsCategoriesPage />} />
-          <Route path="/news-category/:categoryId" element={<NewsPage />} />
-          <Route path="/news/:newsId" element={<NewsDetailPage />} />
+            // News Routes
+            <Route path='/news-category' element={<NewsCategoriesPage />} />
+            <Route path="/news-category/:categoryId" element={<NewsPage />} />
+            <Route path="/news/:newsId" element={<NewsDetailPage />} />
 
-          // Research Route
-          <Route path="/research" element={<ResearchPage />} />
-          <Route path="/research/:researchId" element={<ResearchDetailPage />} />
+            // Research Route
+            <Route path="/research" element={<ResearchPage />} />
+            <Route path="/research/:researchId" element={<ResearchDetailPage />} />
 
-          // Forum Routes
-          <Route path="/forum" element={<ForumsPage />} />
-          <Route path="/forum/create" element={<CreateForumPage />} />
-          <Route path="/forum/:forumId" element={<ForumDetailPage />} />
+            // Forum Routes
+            <Route path="/forum" element={<ForumsPage />} />
+            <Route path="/forum/create" element={<CreateForumPage />} />
+            <Route path="/forum/:forumId" element={<ForumDetailPage />} />
 
-          // Profile Route
-          <Route path="/profile" element={<ProfilePage />} />
+            // Profile Route
+            <Route path="/profile" element={<ProfilePage />} />
 
-          // Course Routes
-          <Route path="/course-category" element={<CourseCategoriesPage />} />
-          <Route path="/course-category/:categoryId" element={<CoursesByCategoryPage />} />
-          <Route path="/course/:courseId" element={<CourseLanding />} />
-          <Route path="/course/:courseId/learn" element={<CourseDetailPage />} />
-          <Route path="/enrollments" element={<Enrollments />} />
-        </Route>
+            // Course Routes
+            <Route path="/course-category" element={<CourseCategoriesPage />} />
+            <Route path="/course-category/:categoryId" element={<CoursesByCategoryPage />} />
+            <Route path="/course/:courseId" element={<CourseLanding />} />
+            <Route path="/course/:courseId/learn" element={<CourseDetailPage />} />
+            <Route path="/enrollments" element={<Enrollments />} />
+          </Route>
 
-        // Admin Routes
-        <Route path="/admin" element={<AdminRoute />}>
-          <Route path="news-categories/create" element={<CreateNewsCategory />} />
-          <Route path="news/create" element={<CreateNews />} />
-          <Route path="research/create" element={<CreateResearchPage />} />
-          <Route path="course-category/create" element={<CreateCourseCategoryPage />} />
-          <Route path="course/create" element={<CreateCoursePage />} />
-          <Route path="course/:courseId/lesson/create" element={<CreateCourseLessonPage />} />
-        </Route>
-      </Routes>
-    </ToastProvider>
+          // Admin Routes
+          <Route path="/admin" element={<AdminRoute />}>
+            <Route path="news-categories/create" element={<CreateNewsCategory />} />
+            <Route path="news/create" element={<CreateNews />} />
+            <Route path="research/create" element={<CreateResearchPage />} />
+            <Route path="course-category/create" element={<CreateCourseCategoryPage />} />
+            <Route path="course/create" element={<CreateCoursePage />} />
+            <Route path="course/:courseId/lesson/create" element={<CreateCourseLessonPage />} />
+          </Route>
+        </Routes>
+      </ToastProvider>
+    </ThemeProvider>
   )
 }
 

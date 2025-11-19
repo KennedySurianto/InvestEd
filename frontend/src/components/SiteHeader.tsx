@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { HashLink } from "react-router-hash-link"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "./ThemeToggle"
 
 export default function SiteHeader() {
   return (
@@ -24,6 +25,7 @@ export default function SiteHeader() {
           </HashLink>
         </nav>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Button asChild variant="ghost" className="hidden md:inline-flex">
             <Link to="/login">Log in</Link>
           </Button>
