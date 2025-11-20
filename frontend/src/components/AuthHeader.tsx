@@ -82,9 +82,6 @@ export default function AppHeader() {
                         <DropdownMenuItem asChild className="cursor-pointer">
                         <Link to="/profile">Profile</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link to="/settings">Settings</Link>
-                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                         onClick={handleLogout}
